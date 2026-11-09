@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentic Robotics</title>
+  <meta name="description" content="Agentic Robotics is a new approach to controlling robots: multi-agent LLM systems write, test, diagnose and iteratively improve structured robot programs, largely offline." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="masthead">
+    <a class="lab" href="https://autolab.berkeley.edu/" target="_blank" rel="noopener"><img src="assets/autolab-logo.png" alt="AUTOLAB" width="79" height="24" /><span>UC Berkeley + NVIDIA</span></a>
+    <nav aria-label="Sections">
+      <a href="#s1">1 Definition</a>
+      <a href="#s2">2 Two cultures</a>
+      <a href="#s3">3 Agentic Robotics</a>
+      <a href="#s4">4 The Pipeline</a>
+      <a href="#references">References</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <article>
+      <figure class="banner" id="fig1">
+        <div class="hero-media">
+          <video src="assets/hero.mp4" poster="assets/hero.jpg" autoplay muted loop playsinline aria-label="Four AUTOLab robots working in a row along the lab's window bench, simulated"></video>
+          <img class="hero-logo" src="assets/autolab-logo.png" alt="AUTOLAB" width="164" height="50" />
+          <p class="hero-note">Every policy on this page is self-learned with the Agentic Robotics framework: zero lines of code from humans.</p>
+          <ol class="hero-tags" aria-label="Robots, left to right">
+            <li style="left:11.8%;top:95.0%"><a class="tag-link" href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener"><strong>VABAR [7] tool sorting</strong><span>Franka</span></a></li>
+            <li style="left:39.9%;top:86.0%"><a class="tag-link" href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener"><strong>FlipAnything</strong><span>YAM, bimanual</span></a></li>
+            <li style="left:62.2%;top:98.5%"><a class="tag-link" href="https://arxiv.org/html/2608.18227v1" target="_blank" rel="noopener"><strong>Push-Alphabet</strong><span>UR5e, bimanual</span></a></li>
+            <li style="left:87.5%;top:98.5%"><a class="tag-link" href="https://sites.google.com/view/sgtm2" target="_blank" rel="noopener"><strong>Cable untangling</strong><span>ABB YuMi</span></a></li>
+          </ol>
+        </div>
+      </figure>
+
+      <div class="body">
+
+        <header class="title-block">
+          <h1>Agentic Robotics</h1>
+          <p class="subtitle">A new approach to controlling robots</p>
+          <p class="affil">UC Berkeley AUTOLab · <a href="https://autolab.berkeley.edu/" target="_blank" rel="noopener">autolab.berkeley.edu</a>, NVIDIA</p>
+        </header>
+
+        <section class="abstract" aria-label="Abstract">
+          <h2>Abstract</h2>
+          <p>There have been two approaches to controlling robots: (1) model-based, where engineers model, program and tune each application, and (2) model-free, where large VLA or ACT models are trained on large datasets of physical demonstrations.</p>
+          <p>Agentic Robotics (AR) is a third approach. In Agentic Robotics, multi-agent LLM systems write, test, diagnose and iteratively improve structured robot programs, largely offline, and increasingly build the simulations those programs are tested in. This website places it between the model-based and model-free traditions, describes the pipeline we are building at AUTOLab, and lists current projects.</p>
+        </section>
+
+        <section id="s1">
+          <h2><span class="num">1</span>What is Agentic Robotics?</h2>
+          <blockquote class="definition">
+            <p>Agentic Robotics uses multi-agent AI systems to write, test, diagnose, and iteratively improve structured robot programs, largely offline.</p>
+            <footer>Ken Goldberg <a class="cite" href="#ref1">[1]</a></footer>
+          </blockquote>
+          <p>Given a task description, a frontier LLM and VLM system composes a library of clearly defined, modular robot skills, which can include VLA policies, into an interpretable robot control system. The pipeline has five components: one human demonstration as the input, three stages that do the work, and ROS2 code as the output. The three stages are (1) Real2Sim, (2) code generation with GaP and recursive self-improvement (RSI), and (3) Sim2Real. Five properties follow from this definition.</p>
+          <ol class="props">
+            <li><b>AR does not need any demonstration data.</b> A single real demonstration serves as evidence for building a simulation of the task, rather than as training data <a class="cite" href="#ref5">[5]</a>.</li>
+            <li><b>Agents build the simulation.</b> With agentic inverse physics, an agent fits a physics model that reproduces a real video. Real-world failures return to the agents as new evidence.</li>
+            <li><b>Graph-based GaP harness.</b> A manipulation system has separate modules for perception, grasp selection, motion planning, force control and failure recovery. Coding agents generate these modules, test them, and improve both the individual skills and the code for the task <a class="cite" href="#ref2">[2]</a>.</li>
+            <li><b>Self-learning runs at scale.</b> Because the learning happens in simulation, thousands of trials can run in parallel and faster than real time <a class="cite" href="#ref1">[1]</a>. Each round, the agent runs hundreds of episodes, groups the failures and rewrites the code; Flip Anything ran 360 simulated episodes per round over 36 policy versions <a class="cite" href="#ref6">[6]</a>.</li>
+            <li><b>Agents work offline to generate interpretable ROS2 graphs and code.</b> Agents can be slow because the work happens offline. The robot runs exported, lightweight, ROS2-compatible code and never a frontier model in its inner control loop.</li>
+          </ol>
+        </section>
+
+        <section id="s2">
+          <h2><span class="num">2</span>A third path between two cultures</h2>
+          <p>Robotics has two dominant cultures <a class="cite" href="#ref3">[3]</a>. Agentic Robotics aims to combine the generality of frontier models with the speed, reliability and interpretability of executable robot programs.</p>
+          <figure class="article-fig">
+            <img src="assets/two_cultures.jpg" alt="Two figures, labelled Model-Based and Model-Free, each holding one end of a chain; the link joining the two halves is labelled Agentic Robotics" width="1600" height="640" />
+            <figcaption class="fig-caption"><b>Figure 1.</b> Agentic Robotics as the link between the model-based and model-free cultures. Image from Goldberg <a class="cite" href="#ref1">[1]</a>.</figcaption>
+          </figure>
+          <figure class="table-fig">
+            <table>
+              <thead><tr><th></th><th>Model-based engineering</th><th>Model-free and VLA</th><th>Agentic Robotics</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Strength</th><td>Fast, interpretable and highly reliable</td><td>Potential to adapt more broadly</td><td>Frontier-model generality with the reliability of executable programs</td></tr>
+                <tr><th scope="row">Cost</th><td>Substantial human engineering for each new task</td><td>Not yet reliable enough for industrial uses</td><td class="tbd">—</td></tr>
+              </tbody>
+            </table>
+            <figcaption class="fig-caption"><b>Table 1.</b> Three approaches to robot intelligence, after Goldberg <a class="cite" href="#ref1">[1]</a>.</figcaption>
+          </figure>
+        </section>
+
+        <section id="s3">
+          <h2><span class="num">3</span>Agentic Robotics</h2>
+          <p>Three stages connect one real demonstration, the input, to ROS2 code, the output, that runs reliably on a real robot. (1) <i>Real2Sim:</i> inverse physics (Block 2) builds a simulation from the demonstration. (2) <i>Code generation:</i> self-learning improves a Graph-as-Policy program <a class="cite" href="#ref2">[2]</a> in that simulation across the variation ranges. (3) <i>Sim2Real:</i> real rollouts (Blocks 5 and 7) test the exported code with no agent on the robot, and failure videos go back either to the simulation or to the code.</p>
+          <figure class="table-fig">
+            <div class="pipeline-scroll">
+            <table class="pipeline">
+              <thead><tr><th></th><th>1. Real2Sim</th><th>2. Code Generation</th><th>3. Sim2Real</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Input</th><td>Video of a human performing the task; desired cameras, sensors and robot specs; task geometry and materials</td><td>Task variation ranges; detailed parameterized Newton physics simulation</td><td>ROS2 graph / code for the desired sensors and robot</td></tr>
+                <tr><th scope="row">Tools</th><td>RSS, Newton, SuperDex</td><td>GaP skill library, GaP harness, frontier LLM, Newton engine</td><td>Real sensors and robot</td></tr>
+                <tr><th scope="row">Method</th><td>Compare the simulation with the real video and revise it</td><td>Recursive self-improvement of the robot control graph / code. Objective: maximize success rate and minimize cycle time</td><td>Iterative self-improvement using real robot rollouts with task variation; failures are reported using videos</td></tr>
+                <tr><th scope="row">Output</th><td>Detailed parameterized Newton physics simulation</td><td>ROS2 graph / code for the desired sensors and robot</td><td>Revised ROS2 graph / code for the desired sensors and robot</td></tr>
+              </tbody>
+            </table>
+            </div>
+            <figcaption class="fig-caption"><b>Table 2.</b> The Agentic Robotics pipeline, after K. Goldberg (7 November 2026).</figcaption>
+          </figure>
+        </section>
+      </div>
+
+      <figure class="wide-fig" id="fig2">
+        <div id="diagram-host" class="diagram-host">
+          <svg viewBox="0 -56 1738 716" class="diagram sketch" role="group" aria-label="Agentic Robotics system diagram"><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah"></path></marker><marker id="arrow-hl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah ah-hl"></path></marker><marker id="arrow-fb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah ah-fb"></path></marker><clipPath id="clip-b1"><rect x="51" y="276" width="160" height="120" rx="10"></rect></clipPath><clipPath id="clip-b5"><rect x="1527" y="276" width="160" height="120" rx="10"></rect></clipPath></defs><text x="869" y="-8" class="figure-title" text-anchor="middle">Agentic Robotics with RSS + GaP</text><g class="regions"><g class="region region-ip"><rect x="24" y="192" width="568" height="406" rx="24"></rect><text x="36" y="638" class="region-label" text-anchor="start">Real2Sim</text></g><g class="region region-ar"><rect x="726" y="180" width="580" height="288" rx="24"></rect><text x="1016" y="168" class="region-label" text-anchor="middle">Code Generation</text></g><g class="region region-ar"><rect x="1494" y="180" width="226" height="288" rx="24"></rect><text x="1607" y="504" class="region-label" text-anchor="middle">Sim2Real</text></g></g><g class="edges"><g class="edge"><path d="M222 312 H394" class="hit"></path><path d="M222 312 H394" class="line"></path><path d="M222 312 H394" class="flow"></path><text x="308" y="272" class="edge-label" text-anchor="middle">video</text><text x="308" y="298" class="edge-label" text-anchor="middle">+ robot URDF</text></g><g class="edge"><path d="M131 410 V514" class="hit"></path><path d="M131 410 V514" class="line"></path><path d="M131 410 V514" class="flow"></path><text x="141" y="466" class="edge-label" text-anchor="start">real video</text></g><g class="edge"><path d="M789 410 V534 Q789 546 777 546 H556" class="hit"></path><path d="M789 410 V534 Q789 546 777 546 H556" class="line"></path><path d="M789 410 V534 Q789 546 777 546 H556" class="flow"></path><text x="779" y="496" class="edge-label" text-anchor="end">sim rollout</text></g><g class="edge feedback"><path d="M485 514 V410" class="hit"></path><path d="M485 514 V410" class="line"></path><path d="M485 514 V410" class="flow"></path><text x="495" y="466" class="edge-label" text-anchor="start">revise</text></g><g class="edge"><path d="M576 312 H748" class="hit"></path><path d="M576 312 H748" class="line"></path><path d="M576 312 H748" class="flow"></path></g><g class="edge"><path d="M889 514 V410" class="hit"></path><path d="M889 514 V410" class="line"></path><path d="M889 514 V410" class="flow"></path><text x="899" y="496" class="edge-label" text-anchor="start">variation</text></g><g class="edge"><path d="M926 272 C964 220 1068 220 1106 268" class="hit"></path><path d="M926 272 C964 220 1068 220 1106 268" class="line"></path><path d="M926 272 C964 220 1068 220 1106 268" class="flow"></path><text x="1016" y="220" class="edge-label" text-anchor="middle">state info</text></g><g class="edge"><path d="M1106 356 C1068 404 964 404 926 352" class="hit"></path><path d="M1106 356 C1068 404 964 404 926 352" class="line"></path><path d="M1106 356 C1068 404 964 404 926 352" class="flow"></path><text x="1016" y="424" class="edge-label" text-anchor="middle">code</text></g><g class="edge export"><path d="M1284 312 H1516" class="hit"></path><path d="M1284 312 H1516" class="line"></path><path d="M1284 312 H1516" class="flow"></path><text x="1353" y="298" class="edge-label" text-anchor="middle">ROS2</text></g><g class="edge feedback"><path d="M1607 214 V83 Q1607 71 1595 71 H1264" class="hit"></path><path d="M1607 214 V83 Q1607 71 1595 71 H1264" class="line"></path><path d="M1607 214 V83 Q1607 71 1595 71 H1264" class="flow"></path><text x="1593" y="61" class="edge-label" text-anchor="end">video</text></g><g class="edge feedback"><path d="M485 110 V214" class="hit"></path><path d="M485 110 V214" class="line"></path><path d="M485 110 V214" class="flow"></path><text x="495" y="142" class="edge-label" text-anchor="start">video:</text><text x="495" y="168" class="edge-label" text-anchor="start">re-model environment</text></g><g class="edge feedback"><path d="M1193 110 V214" class="hit"></path><path d="M1193 110 V214" class="line"></path><path d="M1193 110 V214" class="flow"></path><text x="1203" y="168" class="edge-label" text-anchor="start">revise code</text></g><g class="agent-break"><line x1="1400" x2="1400" y1="162" y2="500"></line><text x="1400" y="148" class="agent-break-label" text-anchor="middle">No Agent!</text></g><text x="308" y="342" class="edge-note" text-anchor="middle">replace hands</text><text x="308" y="364" class="edge-note" text-anchor="middle">w/ robot grippers</text></g><g class="nodes"><g class="node node-big"><rect x="40" y="214" width="182" height="196" rx="22" class="box"></rect><text x="131" y="262" class="node-title long" text-anchor="middle">One Real Demo</text><image href="assets/diagram/human_siemens.jpg" x="51" y="276" width="160" height="120" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-b1)" role="img" aria-label="Human hands sorting tools into an organizer, from the Siemens demonstration video"><title>Human hands sorting tools into an organizer, from the Siemens demonstration video</title></image><rect x="51" y="276" width="160" height="120" rx="10" class="block-image-frame"></rect><rect x="59" y="367" width="144" height="24" rx="6" class="block-image-tag"></rect><text x="131" y="384" class="block-image-tag-text" text-anchor="middle">Env + Human</text><circle cx="44" cy="406" r="19" class="badge"></circle><text x="44" y="412.5" class="badge-text" text-anchor="middle">1</text></g><g class="node node-big node-ip"><rect x="394" y="214" width="182" height="196" rx="22" class="box"></rect><text x="485" y="254" class="node-title" text-anchor="middle">Agentic</text><text x="485" y="286" class="node-title" text-anchor="middle">Inverse Physics</text><g transform="translate(422 304) scale(1.25)" class="logo"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" fill="#111111"></path><title>OpenAI</title></g><g transform="translate(470 304) scale(1.25)" class="logo"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" fill="#D97757"></path><title>Claude</title></g><g transform="translate(518 304) scale(1.25)" class="logo"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81" fill="#4F7DF3"></path><title>Gemini</title></g><g class="chip soft rss"><rect height="36" rx="8" x="392.64537811279297" y="350" width="184.70924377441406"></rect><text x="485" y="373.5" class="chip-text" text-anchor="middle">2A. RoboSimStudio</text></g><circle cx="398" cy="406" r="19" class="badge"></circle><text x="398" y="412.5" class="badge-text" text-anchor="middle">2</text></g><g class="node node-big node-sim"><rect x="748" y="214" width="182" height="196" rx="22" class="box"></rect><text x="839" y="258" class="node-title" text-anchor="middle">Newton Sim</text><rect x="760" y="272" width="158" height="124" rx="12" class="sim-panel"></rect><rect x="774" y="286" width="130" height="44" rx="8" class="sim-env"></rect><text x="839" y="315" class="chip-text big" text-anchor="middle">Env</text><rect x="774" y="340" width="130" height="44" rx="6" class="sim-robot"></rect><text x="839" y="369" class="chip-text big" text-anchor="middle">Robot</text><circle cx="752" cy="406" r="19" class="badge"></circle><text x="752" y="412.5" class="badge-text" text-anchor="middle">3</text></g><g class="node node-big node-gap"><rect x="1102" y="214" width="182" height="196" rx="22" class="box"></rect><text x="1120" y="270" class="node-title" text-anchor="start">Coding*</text><text x="1120" y="310" class="node-title" text-anchor="start">Agent +</text><text x="1120" y="350" class="node-title harness" text-anchor="start">Harness</text><text x="1120" y="388" class="node-title gapname" text-anchor="start">(GaP)</text><circle cx="1106" cy="406" r="19" class="badge"></circle><text x="1106" y="412.5" class="badge-text" text-anchor="middle">4</text></g><g class="node node-big"><rect x="1516" y="214" width="182" height="196" rx="22" class="box"></rect><text x="1607" y="262" class="node-title" text-anchor="middle">Real Rollout</text><image href="assets/diagram/yam_siemens.jpg" x="1527" y="276" width="160" height="120" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-b5)" role="img" aria-label="Two YAM arms doing the same tool-sorting task, shown in simulation"><title>Two YAM arms doing the same tool-sorting task, shown in simulation</title></image><rect x="1527" y="276" width="160" height="120" rx="10" class="block-image-frame"></rect><rect x="1535" y="367" width="144" height="24" rx="6" class="block-image-tag"></rect><text x="1607" y="384" class="block-image-tag-text" text-anchor="middle">Env + YAM robots</text><circle cx="1520" cy="406" r="19" class="badge"></circle><text x="1520" y="412.5" class="badge-text" text-anchor="middle">5</text></g><g class="node node-small node-eval"><rect x="414" y="32" width="850" height="78" rx="39" class="box"></rect><text x="839" y="66" class="node-title small" text-anchor="middle">Real Rollout</text><text x="839" y="90" class="small-sub" text-anchor="middle">success rate · cycle time · across variations</text><circle cx="418" cy="106" r="14" class="badge"></circle><text x="418" y="111" class="badge-text small" text-anchor="middle">7</text></g><g class="node node-small node-cmp"><rect x="60" y="514" width="496" height="74" rx="37" class="box"></rect><text x="308" y="560" class="node-title small" text-anchor="middle">Sim vs Real Comparison</text><circle cx="64" cy="584" r="14" class="badge"></circle><text x="64" y="589" class="badge-text small" text-anchor="middle">1B</text></g><g class="node node-small node-spec"><rect x="819" y="514" width="420" height="74" rx="37" class="box"></rect><text x="1029" y="547" class="node-title small" text-anchor="middle">Variation Ranges</text><text x="1029" y="571" class="small-sub" text-anchor="middle">Δ pose · Δ objects · Δ environment · Δ lighting</text><circle cx="823" cy="584" r="14" class="badge"></circle><text x="823" y="589" class="badge-text small" text-anchor="middle">1A</text></g></g></svg>
+        </div>
+        <figcaption class="fig-caption"><b>Figure 2.</b> Agentic Robotics with RSS + GaP, in three stages: Real2Sim, Code Generation and Sim2Real. No agent runs to the right of the red break: the robot runs the exported ROS2 code. Solid arrows are forward flow; dashed arrows are feedback. *A frontier LLM using the GaP skill library, GaP harness and Newton engine. Images: human hands in the Siemens tool-sorting demonstration (Block 1) and YAM robots on the same task, in simulation (Block 5). Block numbering follows K. Goldberg's revision of the research agenda (21 September 2026).</figcaption>
+      </figure>
+
+      <div class="body">
+        <section id="s4">
+          <h2><span class="num">4</span>The Pipeline</h2>
+          <h3>4.1 Inverse physics and benchmarks for Real2Sim</h3>
+            <article class="pcard">
+              <a class="pmedia" href="https://robosimstudio.github.io" target="_blank" rel="noopener" aria-label="RoboSimStudio: An Interactive Toolkit for Human and Agent Rapid Real2Sim of Robot Manipulation Tasks project page"><video src="assets/projects/rss.mp4" poster="assets/projects/rss.jpg" autoplay muted loop playsinline preload="metadata"></video></a>
+              <div class="pbody">
+                <div class="ptags"><span class="pchip">Preprint · Oct 2026</span><span class="pchip">arXiv:2610.18835</span></div>
+                <h4><a href="https://robosimstudio.github.io" target="_blank" rel="noopener">RoboSimStudio: An Interactive Toolkit for Human and Agent Rapid Real2Sim of Robot Manipulation Tasks</a></h4>
+                <p class="pauthors">Kaiyuan Chen<sup>2,*</sup>, Shuangyu Xie<sup>2,*</sup>, Uksang Yoo<sup>2</sup>, Xinyue Zhu<sup>2</sup>, Cael Magner<sup>2</sup>, Alvin Zhu<sup>2</sup>, Daehwa Kim<sup>2</sup>, Eric Heiden<sup>1</sup>, Erwin Coumans<sup>1</sup>, Miles Macklin<sup>1</sup>, Spencer Huang<sup>1</sup>, Ken Goldberg<sup>2</sup></p>
+                <p class="paffils"><sup>1</sup>NVIDIA · <sup>2</sup>UC Berkeley · <sup>*</sup>Equal contribution</p>
+                <p class="pover">An interactive toolkit on NVIDIA Newton that lets humans and coding agents rapidly rebuild a real manipulation task as a physics simulation (Block 2A).</p>
+                <div class="pbtns"><a class="pbtn" href="https://robosimstudio.github.io" target="_blank" rel="noopener">Project Page</a><a class="pbtn" href="https://arxiv.org/abs/2610.18835" target="_blank" rel="noopener">arXiv</a><a class="pbtn" href="https://robosimstudio.github.io/robosimstudio.pdf" target="_blank" rel="noopener">PDF</a><a class="pbtn" href="https://github.com/robosimstudio/robosimstudio" target="_blank" rel="noopener">Code</a></div>
+              </div>
+            </article>
+            <article class="pcard">
+              <div class="pmedia pgrid"><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Tool sorting"><video src="assets/projects/vabar_tool-sorting.mp4" poster="assets/projects/vabar_tool-sorting.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Tool sorting"></video><span>Tool sorting</span></a><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Tool hanging"><video src="assets/projects/vabar_tool-hanging.mp4" poster="assets/projects/vabar_tool-hanging.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Tool hanging"></video><span>Tool hanging</span></a><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Gear meshing"><video src="assets/projects/vabar_gear-meshing.mp4" poster="assets/projects/vabar_gear-meshing.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Gear meshing"></video><span>Gear meshing</span></a><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Syringe packing"><video src="assets/projects/vabar_syringe-packing.mp4" poster="assets/projects/vabar_syringe-packing.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Syringe packing"></video><span>Syringe packing</span></a><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Cable insertion"><video src="assets/projects/vabar_cable-insertion.mp4" poster="assets/projects/vabar_cable-insertion.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Cable insertion"></video><span>Cable insertion</span></a><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener" title="Cable routing"><video src="assets/projects/vabar_cable-routing.mp4" poster="assets/projects/vabar_cable-routing.jpg" autoplay muted loop playsinline preload="metadata" aria-label="VABAR Cable routing"></video><span>Cable routing</span></a></div>
+              <div class="pbody">
+                <div class="ptags"><span class="pchip pchip-new">New</span><span class="pchip">Benchmark · 2026</span></div>
+                <h4><a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener">VABAR: A Variational Automation Benchmark for Agentic Robotics</a></h4>
+                <p class="pauthors">Shuangyu Xie<sup>3,*</sup>, Kaiyuan Chen<sup>3</sup>, Uksang Yoo<sup>3</sup>, Xinyue Zhu<sup>3</sup>, Meadow Shen<sup>3</sup>, Jaimyn Drake<sup>3</sup>, Eugen Solowjow<sup>1</sup>, Lionel Gulich<sup>2</sup>, Alexander Millane<sup>2</sup>, Rafael Cathomen<sup>2</sup>, Tuur Stuyck<sup>2</sup>, Sangeeta Subramanian<sup>2</sup>, Yichao Pan<sup>2</sup>, Bruce McGowan<sup>2</sup>, Michael Benedict<sup>2</sup>, Linxi Fan<sup>2</sup>, Yuke Zhu<sup>2</sup>, Spencer Huang<sup>2</sup>, Ken Goldberg<sup>3</sup></p>
+                <p class="paffils"><sup>1</sup>Siemens · <sup>2</sup>NVIDIA · <sup>3</sup>UC Berkeley · <sup>*</sup>Equal contribution</p>
+                <p class="pover">Six manipulation task classes from industrial, medical and infrastructure applications, with standardized variation, two difficulty levels and a 33-skill library, on Newton.</p>
+                <div class="pbtns"><a class="pbtn" href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener">Project Page</a><a class="pbtn" href="https://github.com/BerkeleyAutomation/VABAR" target="_blank" rel="noopener">Code</a></div>
+              </div>
+            </article>
+          <h3>4.2 GaP for Code Generation + RSI</h3>
+            <article class="pcard">
+              <a class="pmedia" href="https://graph-robots.github.io/gap/" target="_blank" rel="noopener" aria-label="GaP: A Graph-as-Policy Multi-Agent Self-Learning Harness for Variational Automation Tasks project page"><video src="assets/projects/gap.mp4" poster="assets/projects/gap.jpg" autoplay muted loop playsinline preload="metadata"></video></a>
+              <div class="pbody">
+                <div class="ptags"><span class="pchip">CoRL 2026</span><span class="pchip pchip-award">Spotlight · top 3.4%</span></div>
+                <h4><a href="https://graph-robots.github.io/gap/" target="_blank" rel="noopener">GaP: A Graph-as-Policy Multi-Agent Self-Learning Harness for Variational Automation Tasks</a></h4>
+                <p class="pauthors">Kaiyuan Chen<sup>3,*</sup>, Shuangyu Xie<sup>3,*</sup>, Letian Fu<sup>3</sup>, Justin Yu<sup>3</sup>, William Pacini<sup>3</sup>, Sandeep Bajamahal<sup>3</sup>, Hudson Kim<sup>3</sup>, Jaimyn Drake<sup>3</sup>, Daehwa Kim<sup>3</sup>, Haoru Xue<sup>3</sup>, Jonathan Francis<sup>1</sup>, Christian Juette<sup>1</sup>, Peter Schaldenbrand<sup>1</sup>, Muhammet Yunus Seker<sup>1</sup>, Ruwan Wickramarachchi<sup>1</sup>, Uksang Yoo<sup>3</sup>, Guanzhi Wang<sup>2</sup>, Adithyavairavan Murali<sup>2</sup>, Balakumar Sundaralingam<sup>2</sup>, S. Shankar Sastry<sup>3</sup>, Spencer Huang<sup>2</sup>, Yuke Zhu<sup>2</sup>, Linxi "Jim" Fan<sup>2</sup>, Ken Goldberg<sup>3</sup></p>
+                <p class="paffils"><sup>1</sup>Bosch · <sup>2</sup>NVIDIA · <sup>3</sup>UC Berkeley · <sup>*</sup>Equal contribution</p>
+                <p class="pover">Multiple coding agents write, verify and optimize a robot policy represented as a graph of modular skills, then export lightweight ROS2-compatible code to real robots.</p>
+                <div class="pbtns"><a class="pbtn" href="https://graph-robots.github.io/gap/" target="_blank" rel="noopener">Project Page</a><a class="pbtn" href="https://arxiv.org/abs/2607.05369" target="_blank" rel="noopener">arXiv</a><a class="pbtn" href="https://github.com/graph-robots/graph-as-policy" target="_blank" rel="noopener">Code</a><a class="pbtn" href="https://graph-robots.github.io/graph-as-policy/" target="_blank" rel="noopener">Docs</a><a class="pbtn" href="https://github.com/graph-robots/open-robot-skills" target="_blank" rel="noopener">Skills Library</a></div>
+              </div>
+            </article>
+          <h3>4.3 Case Studies</h3>
+            <article class="pcard">
+              <a class="pmedia" href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener" aria-label="Flip Anything project page"><video src="assets/projects/flip.mp4" poster="assets/projects/flip.jpg" autoplay muted loop playsinline preload="metadata"></video></a>
+              <div class="pbody">
+                <div class="ptags"><span class="pchip">CoRL 2026</span><span class="pchip pchip-award">Late-Breaking Result</span></div>
+                <h4><a href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener">Flip Anything</a></h4>
+                <p class="pauthors">Shuangyu Xie, Kaiyuan Chen, Ken Goldberg</p>
+                <p class="paffils">UC Berkeley</p>
+                <p class="pover">A coding agent writes a bimanual policy to turn any tool face down, reads its own simulated failures and rewrites the code: 24.7% to 95.0% success on 24 tools over 36 versions.</p>
+                <div class="pbtns"><a class="pbtn" href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener">Project Page</a></div>
+              </div>
+            </article>
+            <article class="pcard">
+              <a class="pmedia" href="https://arxiv.org/html/2608.18227v1" target="_blank" rel="noopener" aria-label="Revisiting the "Push-T" Robot Manipulation Task with Agentic Robotics project page"><video src="assets/projects/push.mp4" poster="assets/projects/push.jpg" autoplay muted loop playsinline preload="metadata"></video></a>
+              <div class="pbody">
+                <div class="ptags"><span class="pchip">arXiv:2608.18227</span><span class="pchip">Aug 2026</span></div>
+                <h4><a href="https://arxiv.org/html/2608.18227v1" target="_blank" rel="noopener">Revisiting the "Push-T" Robot Manipulation Task with Agentic Robotics</a></h4>
+                <p class="pauthors">Shuangyu Xie, Kaiyuan Chen, Ken Goldberg</p>
+                <p class="paffils">UC Berkeley</p>
+                <p class="pover">Push-Alphabet: two UR5e arms push seven letter blocks into a row that spells AUTOLAB, planned by a multi-letter MPC skill inside a GaP graph.</p>
+                <div class="pbtns"><a class="pbtn" href="https://arxiv.org/abs/2608.18227" target="_blank" rel="noopener">arXiv</a><a class="pbtn" href="https://arxiv.org/html/2608.18227v1" target="_blank" rel="noopener">HTML</a></div>
+              </div>
+            </article>
+        </section>
+
+        <section id="s5">
+          <h2><span class="num">5</span>Limitations and open problems</h2>
+          <p>Physics models remain imperfect. Active and curriculum-based self-learning need to become more efficient, and robustness and speed must be tuned in both simulation and physical systems. Safety-critical applications will require stronger verification and validation. Coding agents are slow, which suits offline policy development but not every form of real-time adaptation, and it is not yet known whether the architecture scales to open-ended generalist robots or humanoids <a class="cite" href="#ref1">[1]</a>.</p>
+        </section>
+
+        <section id="references" class="refs">
+          <h2>References</h2>
+          <ol>
+            <li id="ref1">K. Goldberg (UC Berkeley). <a href="https://x.com/Ken_Goldberg/status/2100986412762087909" target="_blank" rel="noopener">Goosebumps: a paradigm shift is occurring in robotics</a>. Essay, September 2026.</li>
+            <li id="ref2">K. Chen<sup>3,*</sup>, S. Xie<sup>3,*</sup>, L. Fu<sup>3</sup>, J. Yu<sup>3</sup>, W. Pacini<sup>3</sup>, S. Bajamahal<sup>3</sup>, H. Kim<sup>3</sup>, J. Drake<sup>3</sup>, D. Kim<sup>3</sup>, H. Xue<sup>3</sup>, J. Francis<sup>1</sup>, C. Juette<sup>1</sup>, P. Schaldenbrand<sup>1</sup>, M. Y. Seker<sup>1</sup>, R. Wickramarachchi<sup>1</sup>, U. Yoo<sup>3</sup>, G. Wang<sup>2</sup>, A. Murali<sup>2</sup>, B. Sundaralingam<sup>2</sup>, S. S. Sastry<sup>3</sup>, S. Huang<sup>2</sup>, Y. Zhu<sup>2</sup>, L. "Jim" Fan<sup>2</sup>, K. Goldberg<sup>3</sup>. <a href="https://graph-robots.github.io/gap/" target="_blank" rel="noopener">GaP: A Graph-as-Policy multi-agent self-learning harness for Variational Automation tasks</a>. <i>Conference on Robot Learning (CoRL)</i>, 2026. <span class="ref-affils"><sup>1</sup>Bosch, <sup>2</sup>NVIDIA, <sup>3</sup>UC Berkeley; <sup>*</sup>equal contribution.</span></li>
+            <li id="ref3">K. Goldberg (UC Berkeley). <a href="https://bit.ly/Agentic-Robotics-plenary-by-Ken-Goldberg" target="_blank" rel="noopener">A tale of two cultures: can agentic coding close the gap?</a> Plenary, <i>IEEE ICRA</i>, Vienna, June 2026.</li>
+            <li id="ref4">Ambi Robotics. <a href="https://www.ambirobotics.com/blog/agentic-robotics/" target="_blank" rel="noopener">Agentic Robotics solves an industrial robotics problem</a>. September 2026.</li>
+            <li id="ref5"><a href="https://bit.ly/Robot-Data-Gap" target="_blank" rel="noopener">The 100,000 year robot data gap</a>. <i>Science Robotics</i>, editorial, August 2025.</li>
+            <li id="ref6">S. Xie, K. Chen, K. Goldberg (UC Berkeley). <a href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener">Flip Anything</a>. <i>Conference on Robot Learning (CoRL)</i>, Late-Breaking Result, 2026.</li>
+            <li id="ref7">S. Xie<sup>3,*</sup>, K. Chen<sup>3</sup>, U. Yoo<sup>3</sup>, X. Zhu<sup>3</sup>, M. Shen<sup>3</sup>, J. Drake<sup>3</sup>, E. Solowjow<sup>1</sup>, L. Gulich<sup>2</sup>, A. Millane<sup>2</sup>, R. Cathomen<sup>2</sup>, T. Stuyck<sup>2</sup>, S. Subramanian<sup>2</sup>, Y. Pan<sup>2</sup>, B. McGowan<sup>2</sup>, M. Benedict<sup>2</sup>, L. Fan<sup>2</sup>, Y. Zhu<sup>2</sup>, S. Huang<sup>2</sup>, K. Goldberg<sup>3</sup>. <a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener">VABAR: A Variational Automation Benchmark for Agentic Robotics</a>. 2026. <span class="ref-affils"><sup>1</sup>Siemens, <sup>2</sup>NVIDIA, <sup>3</sup>UC Berkeley; <sup>*</sup>equal contribution.</span></li>
+          </ol>
+        </section>
+
+        <section id="sponsors" class="sponsors" aria-labelledby="sponsors-title">
+          <h2 id="sponsors-title">Sponsors</h2>
+          <div class="sponsor-lead"><img src="assets/sponsors/nvidia.svg" alt="NVIDIA" /></div>
+          <div class="sponsor-grid">
+            <img src="assets/sponsors/bosch.png" alt="Bosch" />
+            <img src="assets/sponsors/siemens.svg" alt="Siemens" />
+          </div>
+        </section>
+      </div>
+    </article>
+  </main>
+
+  <footer class="colophon">
+    <img src="assets/autolab-logo.png" alt="AUTOLAB" width="66" height="20" />
+    <span>UC Berkeley AUTOLab, <a href="https://autolab.berkeley.edu/" target="_blank" rel="noopener">autolab.berkeley.edu</a>, NVIDIA. System diagram by S. Xie, revised by K. Goldberg, November 2026.</span>
+  </footer>
+</body>
+</html>
