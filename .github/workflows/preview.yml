@@ -1,0 +1,28 @@
+name: PR preview
+
+# Publishes each pull request to <site>/pr-preview/pr-N/ on the gh-pages branch,
+# posts the link as a PR comment, and removes the preview when the PR closes.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage site files
+        run: rsync -a --exclude '.git' --exclude '.github' --exclude 'CLAUDE.md' ./ _site/
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: _site
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview

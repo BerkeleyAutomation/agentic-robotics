@@ -1,0 +1,29 @@
+name: Deploy
+
+# Copies main to the root of the gh-pages branch (the live site) on every merge,
+# leaving the pr-preview/ folder alone.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage site files
+        run: rsync -a --exclude '.git' --exclude '.github' --exclude 'CLAUDE.md' ./ _site/
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site
+          branch: gh-pages
+          clean-exclude: pr-preview/
+          force: false
