@@ -75,6 +75,8 @@ h3 { font-size: 16px; font-weight: 600; margin: 22px 0 8px; }
 .abstract h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
 .abstract p { color: var(--ink-2); }
 
+.pipeline-status { margin: 22px 0 0; padding: 14px 20px; background: var(--surface); border-left: 3px solid var(--accent); }
+.pipeline-status p { margin: 0; color: var(--ink-2); }
 .definition { margin: 6px 0 18px; padding: 14px 20px; background: var(--surface); border-left: 3px solid var(--ink); }
 .definition p { font-size: 19px; line-height: 1.5; margin: 0 0 6px; }
 .definition footer { font-family: var(--sans); font-size: 13px; color: var(--muted); }
