@@ -124,7 +124,7 @@ li:last-child > .agenda-item { border-bottom: 0; }
 .plain li { margin-bottom: 4px; }
 
 /* references and citation */
-.refs ol { padding-left: 26px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+.refs ol, .refs ul { padding-left: 26px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
 .refs li { margin-bottom: 6px; }
 .refs li:target { background: #fff7d6; }
 .citation pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; margin: 0; }
