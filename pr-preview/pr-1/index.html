@@ -47,7 +47,12 @@
         </header>
 
         <section class="pipeline-status" aria-label="Pipeline status, November 2026">
-          <p>As of November 2026, the AUTOLab (UC Berkeley) pipeline for Agentic Robotics for Variational Automation tasks takes as input a short video of a robot or human performing a task. (1) Real2Sim: the video is provided to an agent such as Astra with a short textual summary of the task + RoboSimStudio + the desired target robot and sensing hardware specs + any other available environment geometry or specs. The agent combines these to build a detailed Newton physics simulation that visually matches the input video. (2) Code generation: the Graph-as-Policy (GaP) harness takes the Newton simulation as input + expected task variation range and creates and self-improves a robot computation graph that reliably and quickly performs the task for all/most initial states within the task variation range. (3) Sim2Real: the computation graph is exported and converted into ROS2 for execution in real rollouts. Performance feedback is provided to Step 2 for additional self-improvement. Note that no agent is required to run the final ROS2 code.</p>
+          <p>As of November 2026, the AUTOLab (UC Berkeley) pipeline for Agentic Robotics for Variational Automation tasks takes as input a short video of a robot or human performing a task.</p>
+          <ol>
+            <li><span class="step">(1)</span><span><b>Real2Sim:</b> the video is provided to an agent such as Astra with a short textual summary of the task + RoboSimStudio + the desired target robot and sensing hardware specs + any other available environment geometry or specs. The agent combines these to build a detailed Newton physics simulation that visually matches the input video.</span></li>
+            <li><span class="step">(2)</span><span><b>Code generation:</b> the Graph-as-Policy (GaP) harness takes the Newton simulation as input + expected task variation range and creates and self-improves a robot computation graph that reliably and quickly performs the task for all/most initial states within the task variation range.</span></li>
+            <li><span class="step">(3)</span><span><b>Sim2Real:</b> the computation graph is exported and converted into ROS2 for execution in real rollouts. Performance feedback is provided to Step 2 for additional self-improvement. Note that no agent is required to run the final ROS2 code.</span></li>
+          </ol>
         </section>
 
         <section class="abstract" aria-label="Abstract">
