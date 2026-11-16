@@ -46,6 +46,15 @@
           <p class="affil">UC Berkeley AUTOLab · <a href="https://autolab.berkeley.edu/" target="_blank" rel="noopener">autolab.berkeley.edu</a>, NVIDIA</p>
         </header>
 
+        <section class="pipeline-status" aria-label="Pipeline status, November 2026">
+          <p>As of November 2026, the AUTOLab (UC Berkeley) pipeline for Agentic Robotics for Variational Automation tasks takes as input a short video of a robot or human performing a task.</p>
+          <ol>
+            <li><span class="step">(1)</span><span><b>Real2Sim:</b> the video is provided to an agent such as Astra with a short textual summary of the task + RoboSimStudio + the desired target robot and sensing hardware specs + any other available environment geometry or specs. The agent combines these to build a detailed Newton physics simulation that visually matches the input video.</span></li>
+            <li><span class="step">(2)</span><span><b>Code generation:</b> the Graph-as-Policy (GaP) harness takes the Newton simulation as input + expected task variation range and creates and self-improves a robot computation graph that reliably and quickly performs the task for all/most initial states within the task variation range.</span></li>
+            <li><span class="step">(3)</span><span><b>Sim2Real:</b> the computation graph is exported and converted into ROS2 for execution in real rollouts. Performance feedback is provided to Step 2 for additional self-improvement. Note that no agent is required to run the final ROS2 code.</span></li>
+          </ol>
+        </section>
+
         <section class="abstract" aria-label="Abstract">
           <h2>Abstract</h2>
           <p>There have been two approaches to controlling robots: (1) model-based, where engineers model, program and tune each application, and (2) model-free, where large VLA or ACT models are trained on large datasets of physical demonstrations.</p>
@@ -193,6 +202,14 @@
             <li id="ref6">S. Xie, K. Chen, K. Goldberg (UC Berkeley). <a href="https://berkeleyautomation.github.io/flipanything" target="_blank" rel="noopener">Flip Anything</a>. <i>Conference on Robot Learning (CoRL)</i>, Late-Breaking Result, 2026.</li>
             <li id="ref7">S. Xie<sup>3,*</sup>, K. Chen<sup>3,*</sup>, U. Yoo<sup>3,*</sup>, X. Zhu<sup>3</sup>, M. Shen<sup>3</sup>, J. Drake<sup>3</sup>, E. Solowjow<sup>1</sup>, L. Gulich<sup>2</sup>, A. Millane<sup>2</sup>, R. Cathomen<sup>2</sup>, T. Stuyck<sup>2</sup>, S. Subramanian<sup>2</sup>, Y. Pan<sup>2</sup>, B. McGowan<sup>2</sup>, M. Benedict<sup>2</sup>, L. Fan<sup>2</sup>, Y. Zhu<sup>2</sup>, S. Huang<sup>2</sup>, K. Goldberg<sup>3</sup>. <a href="https://berkeleyautomation.github.io/vabar-website/" target="_blank" rel="noopener">VABAR: A Variational Automation Benchmark for Agentic Robotics</a>. 2026. <span class="ref-affils"><sup>1</sup>Siemens, <sup>2</sup>NVIDIA, <sup>3</sup>UC Berkeley; <sup>*</sup>equal contribution.</span></li>
           </ol>
+        </section>
+
+        <section id="press" class="refs">
+          <h2>In the news</h2>
+          <ul>
+            <li>Evan Ackerman. <a href="https://spectrum.ieee.org/agentic-robotics" target="_blank" rel="noopener">Can Agentic Robotics Solve Robotics’ Data-Scaling Problem?</a> <i>IEEE Spectrum</i>, 9 November 2026.</li>
+            <li>Jason Pohl. <a href="https://news.berkeley.edu/2026/11/09/recent-advances-in-ai-are-creating-a-paradigm-shift-for-robotics/" target="_blank" rel="noopener">Recent advances in AI are creating a ‘paradigm shift’ for robotics</a>. <i>UC Berkeley News</i>, 9 November 2026.</li>
+          </ul>
         </section>
 
         <section id="sponsors" class="sponsors" aria-labelledby="sponsors-title">
